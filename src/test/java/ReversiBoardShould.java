@@ -81,13 +81,17 @@ public class ReversiBoardShould {
 
         int numberOfMoves = 5;
         for (int i = 0; i < 2000; i++) {
-            int numericChoice = (int) (Math.round(Math.random() * (5-1)));
-            assertThat(numericChoice,lessThan(numberOfMoves));
-            assertThat(numericChoice,greaterThanOrEqualTo(0));
+            int numericChoice = (int) (Math.round(Math.random() * (5 - 1)));
+            assertThat(numericChoice, lessThan(numberOfMoves));
+            assertThat(numericChoice, greaterThanOrEqualTo(0));
             //System.out.println(numericChoice);
         }
-
-
     }
 
+    @Test
+    public void retrieveCellRating() {
+        assertThat(SquareRating.findRatingForSquare(0,0),is(9));
+        assertThat(SquareRating.findRatingForSquare(0,1),is(0));
+        assertThat(SquareRating.findRatingForSquare(7,7),is(9));
+    }
 }

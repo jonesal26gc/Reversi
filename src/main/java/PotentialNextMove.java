@@ -5,6 +5,7 @@ public class PotentialNextMove {
     private int yAxis;
     private HashMap<DirectionOfCapture, Integer> directionOfCaptureAndScores = new HashMap<DirectionOfCapture, Integer>();
     private int score = 0;
+    private int preferenceRating;
 
     public PotentialNextMove(int xAxis, int yAxis) {
         this.xAxis = xAxis;
@@ -25,6 +26,14 @@ public class PotentialNextMove {
 
     public void setScore(int score) {
         this.score = score;
+    }
+
+    public int getPreferenceRating() {
+        return preferenceRating;
+    }
+
+    public void setPreferenceRating(int preferenceRating) {
+        this.preferenceRating = preferenceRating;
     }
 
     public HashMap<DirectionOfCapture, Integer> getDirectionOfCaptureAndScores() {

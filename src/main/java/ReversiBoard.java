@@ -96,7 +96,20 @@ public class ReversiBoard {
             displayPotentialNextMoves();
             PotentialNextMove potentialNextMove;
             if (autoplayMode & player == SquareType.BLACK) {
-                int numericChoice = (int) (Math.round(Math.random() * (potentialNextMoves.size() - 1)));
+                int numericChoice;
+                int highestPreferenceRating = 0;
+                int highestPreferenceRatingIndex = 0;
+                for (int index = 0; index < potentialNextMoves.size(); index++) {
+                    if (potentialNextMoves.get(index).getPreferenceRating() > highestPreferenceRating) {
+                        highestPreferenceRating = potentialNextMoves.get(index).getPreferenceRating();
+                        highestPreferenceRatingIndex = index;
+                    }
+                }
+                if (highestPreferenceRatingIndex > 0) {
+                    numericChoice = highestPreferenceRatingIndex;
+                } else {
+                    numericChoice = (int) (Math.round(Math.random() * (potentialNextMoves.size() - 1)));
+                }
                 int xAxis = getPotentialNextMoves().get(numericChoice).getXAxis();
                 int yAxis = getPotentialNextMoves().get(numericChoice).getYAxis();
                 String squareReference = String.valueOf(xAxisLabels).substring(xAxis, xAxis + 1)
@@ -229,6 +242,7 @@ public class ReversiBoard {
             if (isAdjacentSquareTypeTheSame(squareType, xAxisAdj, yAxisAdj, directionOfCapture)) {
                 potentialNextMove.addDirectionOfCaptureAndScores(directionOfCapture, score);
                 potentialNextMove.setScore(potentialNextMove.getScore() + score);
+                potentialNextMove.setPreferenceRating(SquareRating.findRatingForSquare(xAxis, yAxis));
             }
         }
     }
@@ -252,7 +266,7 @@ public class ReversiBoard {
     }
 
     public void displayResult() {
-            System.out.println(NEW_LINE + "*********************");
+        System.out.println(NEW_LINE + "*********************");
         if (countOfWhiteBoardCells > countOfBlackBoardCells) {
             System.out.println(SquareType.WHITE.name() + " was the winner.");
         } else {
