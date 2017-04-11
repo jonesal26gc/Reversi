@@ -91,7 +91,7 @@ public class ReversiBoardShould {
     @Test
     public void retrieveCellRating() {
         assertThat(SquareRating.findRatingForSquare(0,0),is(9));
-        assertThat(SquareRating.findRatingForSquare(0,1),is(0));
+        assertThat(SquareRating.findRatingForSquare(0,1),is(4));
         assertThat(SquareRating.findRatingForSquare(7,7),is(9));
     }
 }
