@@ -89,47 +89,19 @@ public class ReversiBoard {
         System.out.println();
     }
 
-    public void nextMove(SquareType player) {
+    public void playerMove(SquareType player) {
         System.out.println(player.name() + "'s move.");
         if (listPotentialMoves(player) > 0) {
             noMovesAvailable = false;
-            displayPotentialNextMoves();
             PotentialNextMove potentialNextMove;
             if (autoplayMode & player == SquareType.BLACK) {
-                int numericChoice;
-                int highestPreferenceRating = 0;
-                int highestPreferenceRatingIndex = 0;
-                for (int index = 0; index < potentialNextMoves.size(); index++) {
-                    if (potentialNextMoves.get(index).getPreferenceRating() > highestPreferenceRating) {
-                        highestPreferenceRating = potentialNextMoves.get(index).getPreferenceRating();
-                        highestPreferenceRatingIndex = index;
-                    }
-                }
-                if (highestPreferenceRatingIndex > 0) {
-                    numericChoice = highestPreferenceRatingIndex;
-                } else {
-                    numericChoice = (int) (Math.round(Math.random() * (potentialNextMoves.size() - 1)));
-                }
-                int xAxis = getPotentialNextMoves().get(numericChoice).getXAxis();
-                int yAxis = getPotentialNextMoves().get(numericChoice).getYAxis();
-                String squareReference = String.valueOf(xAxisLabels).substring(xAxis, xAxis + 1)
-                        + String.valueOf(yAxisLabels).substring(yAxis, yAxis + 1);
-                System.out.println("Move to " + squareReference + " was automatically chosen.");
-                potentialNextMove = getPotentialNextMoves().get(numericChoice);
+                potentialNextMove = automatedPlayerMove();
             } else {
-                while (true) {
-                    String squareReference = userInput.getUserInputString("Enter VALID co-ordinates for " + player.name() + "'s move").toUpperCase();
-                    if (squareReference.equals("X")) {
-                        endOfGame = true;
-                        return;
-                    }
-                    potentialNextMove = checkMoveAgainstPotentialNextMoves(squareReference);
-                    if (potentialNextMove != null) {
-                        break;
-                    }
-                }
+                potentialNextMove = manualPlayerMoveWithUserInput(player);
             }
-            System.out.println(player.name() + " captured " + doPotentialNextMove(player, potentialNextMove) + " pieces.");
+            if (potentialNextMove != null) {
+                System.out.println(player.name() + " captured " + doPotentialNextMove(player, potentialNextMove) + " pieces.");
+            }
         } else {
             System.out.println("No moves VALID moves available.");
             if (noMovesAvailable) {
@@ -146,39 +118,45 @@ public class ReversiBoard {
         return potentialNextMoves.size();
     }
 
-    public void displayPotentialNextMoves() {
-        if (potentialNextMoves.isEmpty()) {
-            System.out.println("There are no moves for you.");
-            return;
+    private PotentialNextMove automatedPlayerMove() {
+        PotentialNextMove potentialNextMove;
+        int numericChoice;
+        int highestPreferenceRating = 0;
+        int highestPreferenceRatingIndex = 0;
+        for (int index = 0; index < potentialNextMoves.size(); index++) {
+            if (potentialNextMoves.get(index).getPreferenceRating() > highestPreferenceRating) {
+                highestPreferenceRating = potentialNextMoves.get(index).getPreferenceRating();
+                highestPreferenceRatingIndex = index;
+            }
         }
-        System.out.println("Potential moves are as follows:");
-        int potentialMoveNumber = 0;
-        for (PotentialNextMove potentialNextMove : potentialNextMoves) {
-            potentialMoveNumber++;
-            System.out.println(String.format(" %1$d) ", potentialMoveNumber) + String.valueOf(xAxisLabels[potentialNextMove.getXAxis()])
-                    + String.valueOf(yAxisLabels[potentialNextMove.getYAxis()])
-                    + " - capturing "
-                    + potentialNextMove.getScore()
-                    + " of your opponent's pieces.");
+        if (highestPreferenceRatingIndex > 0) {
+            numericChoice = highestPreferenceRatingIndex;
+        } else {
+            numericChoice = (int) (Math.round(Math.random() * (potentialNextMoves.size() - 1)));
         }
+        int xAxis = getPotentialNextMoves().get(numericChoice).getXAxis();
+        int yAxis = getPotentialNextMoves().get(numericChoice).getYAxis();
+        String squareReference = String.valueOf(xAxisLabels).substring(xAxis, xAxis + 1)
+                + String.valueOf(yAxisLabels).substring(yAxis, yAxis + 1);
+        System.out.println("Move to " + squareReference + " was automatically chosen.");
+        potentialNextMove = getPotentialNextMoves().get(numericChoice);
+        return potentialNextMove;
     }
 
-    public ArrayList<PotentialNextMove> getPotentialNextMoves() {
-        return potentialNextMoves;
-    }
-
-    public PotentialNextMove checkMoveAgainstPotentialNextMoves(String squareReference) {
-        if (squareReference.length() != 2) {
-            return null;
-        }
-        int xAxis = String.copyValueOf(xAxisLabels).indexOf(squareReference.charAt(0));
-        int yAxis = String.copyValueOf(yAxisLabels).indexOf(squareReference.charAt(1));
-        for (PotentialNextMove potentialNextMove : potentialNextMoves) {
-            if (xAxis == potentialNextMove.getXAxis() & yAxis == potentialNextMove.getYAxis()) {
+    private PotentialNextMove manualPlayerMoveWithUserInput(SquareType player) {
+        displayPotentialNextMoves();
+        PotentialNextMove potentialNextMove;
+        while (true) {
+            String squareReference = userInput.getUserInputString("Enter VALID co-ordinates for " + player.name() + "'s move").toUpperCase();
+            if (squareReference.equals("X")) {
+                endOfGame = true;
+                return null;
+            }
+            potentialNextMove = checkMoveAgainstPotentialNextMoves(squareReference);
+            if (potentialNextMove != null) {
                 return potentialNextMove;
             }
         }
-        return null;
     }
 
     public int doPotentialNextMove(SquareType squareType, PotentialNextMove potentialNextMove) {
@@ -209,6 +187,41 @@ public class ReversiBoard {
                 }
             }
         }
+    }
+
+    public ArrayList<PotentialNextMove> getPotentialNextMoves() {
+        return potentialNextMoves;
+    }
+
+    public void displayPotentialNextMoves() {
+        if (potentialNextMoves.isEmpty()) {
+            System.out.println("There are no moves for you.");
+            return;
+        }
+        System.out.println("Potential moves are as follows:");
+        int potentialMoveNumber = 0;
+        for (PotentialNextMove potentialNextMove : potentialNextMoves) {
+            potentialMoveNumber++;
+            System.out.println(String.format(" %1$d) ", potentialMoveNumber) + String.valueOf(xAxisLabels[potentialNextMove.getXAxis()])
+                    + String.valueOf(yAxisLabels[potentialNextMove.getYAxis()])
+                    + " - capturing "
+                    + potentialNextMove.getScore()
+                    + " of your opponent's pieces.");
+        }
+    }
+
+    public PotentialNextMove checkMoveAgainstPotentialNextMoves(String squareReference) {
+        if (squareReference.length() != 2) {
+            return null;
+        }
+        int xAxis = String.copyValueOf(xAxisLabels).indexOf(squareReference.charAt(0));
+        int yAxis = String.copyValueOf(yAxisLabels).indexOf(squareReference.charAt(1));
+        for (PotentialNextMove potentialNextMove : potentialNextMoves) {
+            if (xAxis == potentialNextMove.getXAxis() & yAxis == potentialNextMove.getYAxis()) {
+                return potentialNextMove;
+            }
+        }
+        return null;
     }
 
     public boolean isSquareOnTheBoardEmpty(int xAxis, int yAxis) {

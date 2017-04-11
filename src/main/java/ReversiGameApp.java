@@ -7,7 +7,7 @@ public class ReversiGameApp {
         while (!reversiBoard.isEndOfGame()) {
             player = reversiBoard.identifyOppositionSquareOnTheBoard(player);
             reversiBoard.displayTheBoard();
-            reversiBoard.nextMove(player);
+            reversiBoard.playerMove(player);
         }
         reversiBoard.displayResult();
         reversiBoard.displayTheBoard();
