@@ -1,4 +1,5 @@
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Map;
 
 public class ReversiBoard {
@@ -115,6 +116,7 @@ public class ReversiBoard {
     public int listPotentialMoves(SquareType squareType) {
         potentialNextMoves.clear();
         analyseAllSquaresOnTheBoard(squareType);
+        Collections.sort(potentialNextMoves);
         return potentialNextMoves.size();
     }
 

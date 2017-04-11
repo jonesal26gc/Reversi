@@ -1,6 +1,6 @@
 import java.util.HashMap;
 
-public class PotentialNextMove {
+public class PotentialNextMove implements Comparable<PotentialNextMove> {
     private int xAxis;
     private int yAxis;
     private HashMap<DirectionOfCapture, Integer> directionOfCaptureAndScores = new HashMap<DirectionOfCapture, Integer>();
@@ -56,5 +56,14 @@ public class PotentialNextMove {
                 ", directionOfCaptureAndScores=" + directionOfCaptureAndScores +
                 ", score=" + score +
                 '}';
+    }
+
+    public int compareTo(PotentialNextMove o) {
+        int x = o.preferenceRating - this.preferenceRating;
+        if (x != 0) {
+            return x;
+        } else {
+            return o.score - this.score;
+        }
     }
 }
